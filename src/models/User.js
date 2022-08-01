@@ -9,6 +9,11 @@ const User = sequelize.define(
       primaryKey: true,
       autoIncrement: true
     },
+    cpf: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      unique: true
+    },
     username: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -32,7 +37,7 @@ const User = sequelize.define(
       allowNull: true
     },
     role: {
-      type: DataTypes.STRING, // admin ou customer
+      type: DataTypes.STRING, // admin ou customer ou delivery-boy
       allowNull: false,
       defaultValue: 'customer'
     }

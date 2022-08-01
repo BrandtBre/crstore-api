@@ -1,21 +1,16 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config";
-import Category from "../models/Category"
 
-const Item = sequelize.define(
-  'items',
+const PaymentMethod = sequelize.define(
+  'payment_methods',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    name: {
+    type: {
       type: DataTypes.STRING,
-      allowNull: false
-    },
-    price: {
-      type: DataTypes.NUMERIC(15,2),
       allowNull: false
     }
   },
@@ -27,13 +22,4 @@ const Item = sequelize.define(
   }
 );
 
-Item.belongsTo(Category, {
-  as: Category,
-  foreignKey: {
-    name: 'categoryId',
-    allowNull: false,
-    field: 'category_id'
-  }
-});
-
-export default Item;
+export default PaymentMethod;

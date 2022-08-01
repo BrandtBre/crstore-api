@@ -1,21 +1,26 @@
+import { DATE } from "sequelize";
+import { NUMERIC } from "sequelize";
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config";
-import Category from "../models/Category"
 
-const Item = sequelize.define(
-  'items',
+const Coupon = sequelize.define(
+  'coupons',
   {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    name: {
-      type: DataTypes.STRING,
+    code: {
+      type: DataTypes.STRING(100),
       allowNull: false
     },
-    price: {
-      type: DataTypes.NUMERIC(15,2),
+    limit_date: {
+      type: DataTypes.DATE,
+      allowNull: false
+    },
+    discount_percentage: {
+      type: DataTypes.NUMERIC,
       allowNull: false
     }
   },
@@ -27,13 +32,4 @@ const Item = sequelize.define(
   }
 );
 
-Item.belongsTo(Category, {
-  as: Category,
-  foreignKey: {
-    name: 'categoryId',
-    allowNull: false,
-    field: 'category_id'
-  }
-});
-
-export default Item;
+export default Coupon;
