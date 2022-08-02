@@ -1,5 +1,5 @@
 import { response } from "express";
-import Adress from "../models/Adress";
+import Coupon from "../models/Coupon";
 
 const get = async (req, res) => {
   try {
@@ -7,7 +7,7 @@ const get = async (req, res) => {
     id = id ? id.toString().replace(/\D/g, '') : null;
 
     if (!id) {
-      const response = await Adress.findAll({
+      const response = await Coupon.findAll({
         order: [['id', 'ASC']]
       });
 
@@ -22,7 +22,7 @@ const get = async (req, res) => {
       return res.status(200).send(response);
     }  
 
-    const response = await Adress.findOne({
+    const response = await Coupon.findOne({
       where: {
         id
       }
@@ -68,9 +68,9 @@ const persist = async (req, res) => {
 }
 
 const create = async (data, res) => {
-  let { street, district, number, city, complement, userId } = data;
+  let { code, limitDate, discountPercentage } = data;
 
-  if (!street || !district || !number || !city || !complement || !userId) {
+  if (!code || !limitDate || !discountPercentage) {
     return res.status(200).send({
       type: 'warning',
       message: 'Ops! você não forneceu os dados necessários!',
@@ -78,13 +78,10 @@ const create = async (data, res) => {
     });
   }
 
-  let response = await Adress.create({
-    street, 
-    district, 
-    number,
-    city,
-    complement,
-    userId
+  let response = await Coupon.create({
+    code,
+    limitDate,
+    discountPercentage
   })
 
   return res.status(201).send(response)
@@ -92,22 +89,22 @@ const create = async (data, res) => {
 }
 
 const update = async (id, data, res) => {
-  let adress = await Adress.findOne({
+  let response = await Coupon.findOne({
     where: {
       id
     }
   });
 
-  if (!adress) {
-    return res.status(400).send({ type: 'error', message: `Não foi encontrado um endereço com o id ${id}` })
+  if (!response) {
+    return res.status(400).send({ type: 'error', message: `Não foi encontrado um Registro com o id ${id}` })
   }
 
-  Object.keys(data).forEach(field => adress[field] = data[field]);
+  Object.keys(data).forEach(field => response[field] = data[field]);
 
-  await adress.save();
+  await response.save();
   return res.status(200).send({
-    message: `Endereço ${id} atualizado com sucesso`,
-    data: adress
+    message: `Registro ${id} atualizado com sucesso`,
+    data: response
   });
 }
 
@@ -124,13 +121,13 @@ const destroy = async (req, res) => {
       });
     }
 
-    let adress = await Adress.findOne({
+    let response = await Coupon.findOne({
       where: {
         id
       }
     })
 
-    if (!adress) {
+    if (!response) {
       return res.status(200).send({
         type: 'warning',
         message: 'Ops! não foi encontrado nada com esse id !',
@@ -138,7 +135,7 @@ const destroy = async (req, res) => {
       });
     }
 
-    await adress.destroy();
+    await response.destroy();
     return res.status(200).send({
       message: `Registro id ${id} deletado com sucesso`
     });

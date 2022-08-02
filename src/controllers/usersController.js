@@ -23,7 +23,7 @@ const getAll = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    let { username, name, phone, password, role } = req.body;
+    let { username, cpf, name, phone, password, role } = req.body;
 
     let userExists = await User.findOne({
       where: {
@@ -42,6 +42,7 @@ const register = async (req, res) => {
 
     let response = await User.create({
       username,
+      cpf,
       name,
       phone,
       passwordHash,

@@ -28,7 +28,9 @@ const Item = sequelize.define(
 );
 
 Item.belongsTo(Category, {
-  as: Category,
+  as: "category",
+  onDelete: 'NO ACTION',
+  onUpdate: 'NO ACTION',
   foreignKey: {
     name: 'categoryId',
     allowNull: false,

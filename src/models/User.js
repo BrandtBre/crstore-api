@@ -38,7 +38,7 @@ const User = sequelize.define(
     },
     role: {
       type: DataTypes.STRING, // admin ou customer ou delivery-boy
-      allowNull: false,
+      allowNull: true,
       defaultValue: 'customer'
     }
   },

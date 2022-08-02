@@ -1,5 +1,5 @@
-import { response } from "express";
-import Adress from "../models/Adress";
+
+import Order from "../models/Order";
 
 const get = async (req, res) => {
   try {
@@ -7,11 +7,18 @@ const get = async (req, res) => {
     id = id ? id.toString().replace(/\D/g, '') : null;
 
     if (!id) {
-      const response = await Adress.findAll({
+      const orders = await Order.findAll({
         order: [['id', 'ASC']]
       });
-
-      if (!response.length) {
+      let response = [];
+      for (let orders of orderss) {
+        let livros = await orders.getLivros(); 
+        orders = orders.toJSON(); 
+        orders.livros = livros; 
+        response.push(orders);
+      }
+      
+      if (!orders.length) {
         return res.status(200).send({
           type: 'warning',
           message: 'Ops! Não foi encontrado os registros!',
@@ -22,13 +29,13 @@ const get = async (req, res) => {
       return res.status(200).send(response);
     }  
 
-    const response = await Adress.findOne({
+    const orders = await Order.findOne({
       where: {
         id
       }
     })
     
-    if (!response) {
+    if (!orders) {
       return res.status(200).send({
         type: 'warning',
         message: 'Ops! Não foi encontrado os registros!',
@@ -36,7 +43,7 @@ const get = async (req, res) => {
       });
     }
 
-    return res.status(200).send(response);
+    return res.status(200).send(orders);
 
   } catch (error) {
     return res.status(200).send({
@@ -68,9 +75,9 @@ const persist = async (req, res) => {
 }
 
 const create = async (data, res) => {
-  let { street, district, number, city, complement, userId } = data;
+  let { type } = data;
 
-  if (!street || !district || !number || !city || !complement || !userId) {
+  if (!type) {
     return res.status(200).send({
       type: 'warning',
       message: 'Ops! você não forneceu os dados necessários!',
@@ -78,36 +85,31 @@ const create = async (data, res) => {
     });
   }
 
-  let response = await Adress.create({
-    street, 
-    district, 
-    number,
-    city,
-    complement,
-    userId
+  let orders = await Order.create({
+    type
   })
 
-  return res.status(201).send(response)
+  return res.status(201).send(orders)
 
 }
 
 const update = async (id, data, res) => {
-  let adress = await Adress.findOne({
+  let orders = await Order.findOne({
     where: {
       id
     }
   });
 
-  if (!adress) {
-    return res.status(400).send({ type: 'error', message: `Não foi encontrado um endereço com o id ${id}` })
+  if (!orders) {
+    return res.status(400).send({ type: 'error', message: `Não foi encontrado um Registro com o id ${id}` })
   }
 
-  Object.keys(data).forEach(field => adress[field] = data[field]);
+  Object.keys(data).forEach(field => orders[field] = data[field]);
 
-  await adress.save();
+  await orders.save();
   return res.status(200).send({
-    message: `Endereço ${id} atualizado com sucesso`,
-    data: adress
+    message: `Registro ${id} atualizado com sucesso`,
+    data: orders
   });
 }
 
@@ -124,13 +126,13 @@ const destroy = async (req, res) => {
       });
     }
 
-    let adress = await Adress.findOne({
+    let orders = await Order.findOne({
       where: {
         id
       }
     })
 
-    if (!adress) {
+    if (!orders) {
       return res.status(200).send({
         type: 'warning',
         message: 'Ops! não foi encontrado nada com esse id !',
@@ -138,7 +140,7 @@ const destroy = async (req, res) => {
       });
     }
 
-    await adress.destroy();
+    await orders.destroy();
     return res.status(200).send({
       message: `Registro id ${id} deletado com sucesso`
     });
