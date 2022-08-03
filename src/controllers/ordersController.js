@@ -1,5 +1,7 @@
 
 import Order from "../models/Order";
+import Item from "../models/Item";
+import OrderItem from "../models/OrderItem";
 
 const get = async (req, res) => {
   try {
@@ -10,13 +12,6 @@ const get = async (req, res) => {
       const orders = await Order.findAll({
         order: [['id', 'ASC']]
       });
-      let response = [];
-      for (let orders of orderss) {
-        let livros = await orders.getLivros(); 
-        orders = orders.toJSON(); 
-        orders.livros = livros; 
-        response.push(orders);
-      }
       
       if (!orders.length) {
         return res.status(200).send({
@@ -25,6 +20,15 @@ const get = async (req, res) => {
           data: []
         });
       }
+      
+      let response = [];
+      for (let order of orders) {
+        let items = await order.getItems(); 
+        order = order.toJSON(); 
+        order.items = items; 
+        response.push(order);
+      }
+      
       
       return res.status(200).send(response);
     }  
@@ -42,6 +46,11 @@ const get = async (req, res) => {
         data: []
       });
     }
+
+    let response = orders.toJSON();
+    response.items = await orders.getItem({
+      attributes: ['id', 'name', 'price', 'categoryId'],
+    });
 
     return res.status(200).send(orders);
 
@@ -75,22 +84,46 @@ const persist = async (req, res) => {
 }
 
 const create = async (data, res) => {
-  let { type } = data;
+  let { status, customerId, employeeId, paymentMethodId, couponId, items } = data;
 
-  if (!type) {
+  if (!status || !customerId || !employeeId || !paymentMethodId || !couponId ) {
     return res.status(200).send({
       type: 'warning',
       message: 'Ops! você não forneceu os dados necessários!',
       data: []
     });
   }
-
-  let orders = await Order.create({
-    type
+  let order = await Order.create({
+    status,
+    customerId,
+    employeeId,
+    paymentMethodId,
+    couponId
   })
+  for (let item of items) {
+    let itemExistente = await Item.findOne({
+      where: {
+        id: item.itemId
+      }
+    })
+    
+    if (!itemExistente) {
+      await order.destroy();
+      return res.status(400).send({
+        message: `O item id ${item} não existe. O pedido não foi salvo!!`
+      })
+    }
 
-  return res.status(201).send(orders)
-
+    await OrderItem.create({
+      quantity: item.quantity,
+      price: item.price,
+      total: item.total,
+      orderId: order.id,
+      itemId: itemExistente.id
+    });
+  }
+  
+  return res.status(201).send(order)
 }
 
 const update = async (id, data, res) => {

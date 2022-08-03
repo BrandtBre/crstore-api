@@ -28,9 +28,9 @@ const Order = sequelize.define(
 Order.belongsTo(User, {
   as: 'customer',
   foreignKey: {
-    name: 'cusotomerId',
+    name: 'customerId',
     allowNull: false,
-    field: 'cusotomer_id'
+    field: 'customer_id'
   }
 });
 
@@ -56,7 +56,7 @@ Order.belongsTo(Coupon, {
   as: 'coupon',
   foreignKey: {
     name: 'couponId',
-    allowNull: false,
+    allowNull: true,
     field: 'coupon_id'
   }
 });

@@ -51,11 +51,11 @@ const get = async (req, res) => {
 const persist = async (req, res) => {
   try {
     let { id } = req.params;
-
+    console.log(id);
     if (!id) {
       return await create(req.body, res);
     }
-
+    
     return await update(id, req.body, res);
 
   } catch (error) {
@@ -87,6 +87,7 @@ const create = async (data, res) => {
 }
 
 const update = async (id, data, res) => {
+  
   let response = await Category.findOne({
     where: {
       id

@@ -14,6 +14,14 @@ const OrderItem = sequelize.define(
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    price: {
+      type: DataTypes.NUMERIC,
+      allowNull: false
+    },
+    total: {
+      type: DataTypes.NUMERIC,
+      allowNull: false
     }
   },
   {

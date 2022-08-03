@@ -15,13 +15,15 @@ const Coupon = sequelize.define(
       type: DataTypes.STRING(100),
       allowNull: false
     },
-    limit_date: {
+    limitDate: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      field: "limit_date"
     },
-    discount_percentage: {
+    discountPercentage: {
       type: DataTypes.NUMERIC,
-      allowNull: false
+      allowNull: false,
+      field: "discount_percentage"
     }
   },
   {
