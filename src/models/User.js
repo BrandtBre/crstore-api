@@ -40,7 +40,7 @@ const User = sequelize.define(
       type: DataTypes.STRING, // admin ou customer ou delivery-boy
       allowNull: true,
       defaultValue: 'customer'
-    }
+    }                                                                                                                                                                                                               
   },
   {
     freezeTableName: true,
