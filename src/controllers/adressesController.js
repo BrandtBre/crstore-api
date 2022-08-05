@@ -19,7 +19,11 @@ const get = async (req, res) => {
         });
       }
       
-      return res.status(200).send(response);
+      return res.status(200).send({
+        type: 'success',
+        message: 'Deu boa',
+        data: response
+      });
     }  
 
     const response = await Adress.findOne({
@@ -36,7 +40,11 @@ const get = async (req, res) => {
       });
     }
 
-    return res.status(200).send(response);
+    return res.status(200).send({
+      type: 'success',
+      message: 'Deu boa',
+      data: response
+    });
 
   } catch (error) {
     return res.status(200).send({
@@ -86,8 +94,11 @@ const create = async (data, res) => {
     complement,
     userId
   })
-
-  return res.status(201).send(response)
+  return res.status(201).send({
+      type: 'warning',
+      message: 'Deu bom!!',
+      data: response
+  });
 
 }
 
@@ -106,6 +117,7 @@ const update = async (id, data, res) => {
 
   await adress.save();
   return res.status(200).send({
+    type: 'success',
     message: `Endereço ${id} atualizado com sucesso`,
     data: adress
   });
@@ -140,7 +152,9 @@ const destroy = async (req, res) => {
 
     await adress.destroy();
     return res.status(200).send({
-      message: `Registro id ${id} deletado com sucesso`
+      type: 'success',
+      message: `Endereço ${id} deletado com sucesso`,
+      data: adress
     });
 
   } catch (error) {
