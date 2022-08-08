@@ -30,7 +30,11 @@ const get = async (req, res) => {
       }
       
       
-      return res.status(200).send(response);
+      return res.status(200).send({
+        type: 'success',
+        message: 'Deu bom !',
+        data: response
+      });
     }  
 
     const orders = await Order.findOne({
@@ -48,11 +52,15 @@ const get = async (req, res) => {
     }
 
     let response = orders.toJSON();
-    response.items = await orders.getItem({
+    response.items = await orders.getItems({
       attributes: ['id', 'name', 'price', 'categoryId'],
     });
 
-    return res.status(200).send(orders);
+    res.status(200).send({
+      type: 'success',
+      message: 'Deu bom',
+      data: orders
+    });
 
   } catch (error) {
     return res.status(200).send({

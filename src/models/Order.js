@@ -14,7 +14,7 @@ const Order = sequelize.define(
     },
     status: { 
       type: DataTypes.BOOLEAN,
-      allowNull: false
+      allowNull: true
     }
   },
   {

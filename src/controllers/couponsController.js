@@ -19,7 +19,11 @@ const get = async (req, res) => {
         });
       }
       
-      return res.status(200).send(response);
+      return res.status(200).send({
+        type: 'success',
+        message: 'Deu boa!',
+        data: response
+      });
     }  
 
     const response = await Coupon.findOne({
@@ -36,7 +40,11 @@ const get = async (req, res) => {
       });
     }
 
-    return res.status(200).send(response);
+    res.status(200).send({
+      type: 'success',
+      message: 'Deu boa!',
+      data: response
+    });
 
   } catch (error) {
     return res.status(200).send({
