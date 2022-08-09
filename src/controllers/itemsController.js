@@ -19,7 +19,7 @@ const get = async (req, res) => {
         });
       }
       
-      res.status(200).send({
+      return res.status(200).send({
         type: 'success',
         message: 'Deu boa!',
         data: response
@@ -55,6 +55,40 @@ const get = async (req, res) => {
   }
 }
 
+const getByCategory = async (req, res) => {
+  try {
+    let { categoryId } = req.params;
+    
+    console.log(categoryId);
+
+    const response = await Item.findAll({
+      where: {
+        categoryId
+      }
+    });
+
+    if (!response) {
+      return res.status(200).send({
+        type: 'warning',
+        message: 'Ops! Não foi encontrado nenhum produto registrado nessa categoria =(!',
+        data: []
+      });
+    };
+
+    return res.status(200).send({
+      type: 'success',
+      message: 'Deu boa!',
+      data: response
+    });
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
 
 const persist = async (req, res) => {
   try {
@@ -160,5 +194,6 @@ const destroy = async (req, res) => {
 export default {
   get,
   persist,
-  destroy
+  destroy,
+  getByCategory
 }

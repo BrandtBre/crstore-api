@@ -1,5 +1,6 @@
 import { response } from "express";
 import Adress from "../models/Adress";
+import usersController from "./usersController";
 
 const get = async (req, res) => {
   try {
@@ -55,6 +56,28 @@ const get = async (req, res) => {
   }
 }
 
+const getByUserId = async (req, res) => {
+  try {
+    let user = await usersController.getUserByToken(req.headers.authorization)
+
+    const response = await Adress.findAll({
+      where: { userId: user.id }
+    });
+
+    return res.status(200).send({
+      type: 'success',
+      message: 'Deu boa',
+      data: response
+    });
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+}
 
 const persist = async (req, res) => {
   try {
@@ -169,5 +192,6 @@ const destroy = async (req, res) => {
 export default {
   get,
   persist,
-  destroy
+  destroy,
+  getByUserId
 }

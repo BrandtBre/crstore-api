@@ -14,11 +14,13 @@ export default async (req, res, next) => {
 
     const token = authorization.split(' ')[1] || null;
     const decodedToken = jwt.decode(token);
+
+    console.log('TOKEN: ', token)
     
     if (!decodedToken) {
       return res.status(200).send({
         type: 'error',
-        message: 'Você não tem permissão para acessar esse recurso!'
+        message: 'Você não tem permissão para acessar esse recurso!!!!!'
       })
     }
 
