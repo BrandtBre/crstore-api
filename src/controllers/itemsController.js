@@ -59,8 +59,6 @@ const getByCategory = async (req, res) => {
   try {
     let { categoryId } = req.params;
     
-    console.log(categoryId);
-
     const response = await Item.findAll({
       where: {
         categoryId
@@ -74,7 +72,7 @@ const getByCategory = async (req, res) => {
         data: []
       });
     };
-
+    
     return res.status(200).send({
       type: 'success',
       message: 'Deu boa!',

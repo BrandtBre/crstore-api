@@ -22,6 +22,7 @@ const getAll = async (req, res) => {
 }
 
 const getUserByToken = async (authorization) => {
+  console.log("opa");
   if (!authorization) {
     return null;
   }
@@ -38,7 +39,6 @@ const getUserByToken = async (authorization) => {
       id: decodedToken.userId
     }
   })
-
   if (!user) {
     return null;
   }

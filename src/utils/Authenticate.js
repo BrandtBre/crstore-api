@@ -13,7 +13,7 @@ export default async (req, res, next) => {
     }
 
     const token = authorization.split(' ')[1] || null;
-    const decodedToken = jwt.decode(token);
+    const decodedToken = jwt.decode(token)
 
     console.log('TOKEN: ', token)
     

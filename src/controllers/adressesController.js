@@ -58,12 +58,13 @@ const get = async (req, res) => {
 
 const getByUserId = async (req, res) => {
   try {
-    let user = await usersController.getUserByToken(req.headers.authorization)
+    
+    let user = await usersController.getUserByToken(req.headers.authorization);
 
     const response = await Adress.findAll({
       where: { userId: user.id }
     });
-
+    
     return res.status(200).send({
       type: 'success',
       message: 'Deu boa',
@@ -83,11 +84,20 @@ const persist = async (req, res) => {
   try {
     let { id } = req.params;
 
-    if (!id) {
-      return await create(req.body, res);
+    let user = await usersController.getUserByToken(req.headers.authorization);
+
+    if (!user) {
+      return res.send({
+        type: 'error',
+        message: 'não foi possivel identificar o usuario'
+      })
     }
 
-    return await update(id, req.body, res);
+    if (!id) {
+      return await create(req.body, res, user);
+    }
+
+    return await update(id, req.body, res, user);
 
   } catch (error) {
     return res.status(200).send({
@@ -98,10 +108,10 @@ const persist = async (req, res) => {
   }
 }
 
-const create = async (data, res) => {
-  let { street, district, number, city, complement, userId } = data;
+const create = async (data, res, user) => {
+  let { street, district, number, city, complement } = data;
 
-  if (!street || !district || !number || !city || !complement || !userId) {
+  if (!street || !district || !number || !city || !complement) {
     return res.status(200).send({
       type: 'warning',
       message: 'Ops! você não forneceu os dados necessários!',
@@ -109,14 +119,17 @@ const create = async (data, res) => {
     });
   }
 
+  console.log(user);
+
   let response = await Adress.create({
     street, 
     district, 
     number,
     city,
     complement,
-    userId
-  })
+    userId: user.id
+  }); 
+  
   return res.status(201).send({
       type: 'warning',
       message: 'Deu bom!!',
@@ -125,16 +138,18 @@ const create = async (data, res) => {
 
 }
 
-const update = async (id, data, res) => {
+const update = async (id, data, res, user) => {
+
   let adress = await Adress.findOne({
     where: {
-      id
+      id, 
+      userId: user.id
     }
   });
 
   if (!adress) {
     return res.status(400).send({ type: 'error', message: `Não foi encontrado um endereço com o id ${id}` })
-  }
+  };
 
   Object.keys(data).forEach(field => adress[field] = data[field]);
 
@@ -177,7 +192,7 @@ const destroy = async (req, res) => {
     return res.status(200).send({
       type: 'success',
       message: `Endereço ${id} deletado com sucesso`,
-      data: adress
+      data: []
     });
 
   } catch (error) {
