@@ -6,6 +6,7 @@ import Coupon from "./Coupon";
 import Order from "./Order";
 import OrderItem from "./OrderItem";
 import PaymentMethod from "./PaymentMethod";
+import Cart from "./Cart";
 
 
 (async () => {
@@ -17,4 +18,5 @@ import PaymentMethod from "./PaymentMethod";
   //  await PaymentMethod.sync({ force: true })
   //  await Order.sync({ force: true })
   //  await OrderItem.sync({ force: true })
+  // await Cart.sync({ force: true })
 })();

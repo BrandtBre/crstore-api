@@ -1,6 +1,5 @@
 import { response } from "express";
-import Adress from "../models/Adress";
-import usersController from "./usersController";
+import Cart from "../models/Cart";
 
 const get = async (req, res) => {
   try {
@@ -8,7 +7,7 @@ const get = async (req, res) => {
     id = id ? id.toString().replace(/\D/g, '') : null;
 
     if (!id) {
-      const response = await Adress.findAll({
+      const response = await Cart.findAll({
         order: [['id', 'ASC']]
       });
 
@@ -22,12 +21,12 @@ const get = async (req, res) => {
       
       return res.status(200).send({
         type: 'success',
-        message: 'Deu boa',
+        message: 'Deu boa!',
         data: response
       });
     }  
 
-    const response = await Adress.findOne({
+    const response = await Cart.findOne({
       where: {
         id
       }
@@ -41,9 +40,9 @@ const get = async (req, res) => {
       });
     }
 
-    return res.status(200).send({
+    res.status(200).send({
       type: 'success',
-      message: 'Deu boa',
+      message: 'Deu boa!',
       data: response
     });
 
@@ -65,9 +64,17 @@ const getByUserId = async (req, res) => {
       where: { userId: user.id }
     });
     
+    if (!response.length) {
+      return res.status(200).send({
+        type: 'error',
+        message: 'Você ainda não tem nenhum carrinho!',
+        data: error.message
+      });
+    }
+
     return res.status(200).send({
       type: 'success',
-      message: 'Deu bom',
+      message: 'Deu boa',
       data: response
     });
 
@@ -83,15 +90,7 @@ const getByUserId = async (req, res) => {
 const persist = async (req, res) => {
   try {
     let { id } = req.params;
-
     let user = await usersController.getUserByToken(req.headers.authorization);
-
-    if (!user) {
-      return res.send({
-        type: 'error',
-        message: 'não foi possivel identificar o usuario'
-      })
-    }
 
     if (!id) {
       return await create(req.body, res, user);
@@ -109,9 +108,9 @@ const persist = async (req, res) => {
 }
 
 const create = async (data, res, user) => {
-  let { street, district, number, city, complement } = data;
+  let { items, customerId } = data;
 
-  if (!street || !district || !number || !city || !complement) {
+  if (!items || !customerId ) {
     return res.status(200).send({
       type: 'warning',
       message: 'Ops! você não forneceu os dados necessários!',
@@ -119,43 +118,56 @@ const create = async (data, res, user) => {
     });
   }
 
-  let response = await Adress.create({
-    street, 
-    district, 
-    number,
-    city,
-    complement,
-    userId: user.id
-  }); 
-  
-  return res.status(201).send({
-      type: 'warning',
-      message: 'Deu bom!!',
-      data: response
-  });
+  let response = await Cart.create({
+    items,
+    customerId: user.id
+  })
+
+  return res.status(201).send(response)
 
 }
 
-const update = async (id, data, res, user) => {
+const addToCart = async (data, res, item) => {
+  try {
+    let { items, customerId } = data;
+    let carrinho = Cart;
+    let i = findIndex(itemCart => item === itemCart.id)
 
-  let adress = await Adress.findOne({
+    if (i == -1) {
+      carrinho.push({id: item, quantidade });
+    } else {
+        carrinho[i].quantidade += quantidade;
+    }
+
+
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Ops! Ocorreu um erro!',
+      data: error.message
+    });
+  }
+
+}
+
+const update = async (id, data, res) => {
+  let response = await Cart.findOne({
     where: {
-      id, 
-      userId: user.id
+      id
     }
   });
 
-  if (!adress) {
-    return res.status(400).send({ type: 'error', message: `Não foi encontrado um endereço com o id ${id}` })
-  };
+  if (!response) {
+    return res.status(400).send({ type: 'error', message: `Não foi encontrado um Registro com o id ${id}` })
+  }
 
-  Object.keys(data).forEach(field => adress[field] = data[field]);
+  Object.keys(data).forEach(field => response[field] = data[field]);
 
-  await adress.save();
+  await response.save();
   return res.status(200).send({
-    type: 'success',
-    message: `Endereço ${id} atualizado com sucesso`,
-    data: adress
+    message: `Registro ${id} atualizado com sucesso`,
+    data: response
   });
 }
 
@@ -172,13 +184,13 @@ const destroy = async (req, res) => {
       });
     }
 
-    let adress = await Adress.findOne({
+    let response = await Cart.findOne({
       where: {
         id
       }
     })
 
-    if (!adress) {
+    if (!response) {
       return res.status(200).send({
         type: 'warning',
         message: 'Ops! não foi encontrado nada com esse id !',
@@ -186,11 +198,9 @@ const destroy = async (req, res) => {
       });
     }
 
-    await adress.destroy();
+    await response.destroy();
     return res.status(200).send({
-      type: 'success',
-      message: `Endereço ${id} deletado com sucesso`,
-      data: []
+      message: `Registro id ${id} deletado com sucesso`
     });
 
   } catch (error) {

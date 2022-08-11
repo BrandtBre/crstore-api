@@ -108,9 +108,9 @@ const persist = async (req, res) => {
 }
 
 const create = async (data, res) => {
-  let { name, price, categoryId } = data;
+  let { name, price, categoryId, quantity } = data;
 
-  if (!name || !price || !categoryId) {
+  if (!name || !price || !categoryId || !quantity) {
     return res.status(200).send({
       type: 'warning',
       message: 'Ops! você não forneceu os dados necessários!',
@@ -121,7 +121,8 @@ const create = async (data, res) => {
   let response = await Item.create({
     name,
     price,
-    categoryId
+    categoryId,
+    quantity
   })
 
   return res.status(201).send(response)
