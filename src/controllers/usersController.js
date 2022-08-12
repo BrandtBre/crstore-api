@@ -105,7 +105,7 @@ const login = async (req, res) => {
     }
 
     let token = jwt.sign(
-      { userId: user.id, username: user.username }, //payload - dados utilizados na criacao do token
+      { userId: user.id, username: user.username}, //payload - dados utilizados na criacao do token
       process.env.TOKEN_KEY, //chave PRIVADA da aplicação 
       { expiresIn: '1h' } //options ... em quanto tempo ele expira...
     );
@@ -116,7 +116,7 @@ const login = async (req, res) => {
     return res.status(200).send({
       type: 'success',
       message: 'Bem-vindo! Login realizado com sucesso!',
-      token
+      data: token
     });
   } catch (error) {
     return res.status(200).send({
@@ -127,9 +127,70 @@ const login = async (req, res) => {
   }
 }
 
+const validateToken = async (req, res) => {
+  try {
+    const authorization = req.headers.authorization;
+
+    if (!authorization) {
+      return res.status(200).send({
+        type: 'error',
+        message: 'Token não informado'
+      })
+    }
+
+    const token = authorization.split(' ')[1] || null;
+    let decodedToken = jwt.decode(token);
+    
+    if (!decodedToken) {
+      return res.status(200).send({
+        type: 'error',
+        message: 'Não foi possível decodar o token'
+      })
+    }
+    
+
+
+    if (decodedToken.exp < (Date.now() / 1000)) {
+      return res.status(200).send({
+        type: 'error',
+        message: 'Sua sessão expirou! Faça login novamente',
+        data: response
+      })
+    }
+
+    const user = await User.findOne({
+      where: {
+        id: decodedToken.userId
+      }
+    })
+
+    if (!user) {
+      return res.status(200).send({
+        type: 'error',
+        message: 'Usuário não encontrado'
+      })
+    }
+
+    return res.status(200).send({
+      type: 'success',
+      message: 'Token validado com sucesso',
+      data: user
+    })
+
+  } catch (error) {
+    return res.status(200).send({
+      type: 'error',
+      message: 'Deu merda!',
+    });
+  }
+
+
+}
+
 export default {
   getAll,
   register,
   login,
-  getUserByToken
+  getUserByToken,
+  validateToken
 }

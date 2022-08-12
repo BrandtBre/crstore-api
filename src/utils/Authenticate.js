@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 import User from "../models/User";
 
 export default async (req, res, next) => {
@@ -13,17 +13,20 @@ export default async (req, res, next) => {
     }
 
     const token = authorization.split(' ')[1] || null;
-    const decodedToken = jwt.decode(token)
+    let decodedToken = jwt.decode(token)
 
-    console.log('TOKEN: ', token)
-    
     if (!decodedToken) {
       return res.status(200).send({
         type: 'error',
         message: 'Você não tem permissão para acessar esse recurso!!!!!'
       })
     }
-
+    let   response = await User.findOne({
+      where: {  
+        id: decodedToken.userId 
+        }
+    });
+    decodedToken = jwt.decode(response.token)
     if (decodedToken.exp < (Date.now() / 1000)) {
       return res.status(200).send({
         type: 'error',
